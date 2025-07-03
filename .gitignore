@@ -1,0 +1,6 @@
+__pycache__/
+venv/
+contract_abi.json
+contract_bytecode.json
+.idea/
+.env
