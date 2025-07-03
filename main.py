@@ -7,7 +7,6 @@ from pydantic import BaseModel # <<< Імпортуємо BaseModel з Pydantic
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
 
-# Test
 # --- Модель Pydantic для даних розгортання голосування ---
 # Ця модель описує структуру JSON, яку ми очікуємо в тілі POST-запиту
 class DeployVotingRequest(BaseModel): # <<< Оголошуємо Pydantic модель
