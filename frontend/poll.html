@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Голосування</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="ethers.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-left-group">
+                <a href="index.html" class="back-arrow" title="На головну">⬅</a>
+                <a href="index.html" class="app-logo">
+                    <span style="font-size: 1.5rem;">🗳️</span> Voting DApp
+                </a>
+            </div>
+
+            <div style="display: flex; align-items: center;">
+                <span id="walletInfo" style="font-weight: 600; color: #6B7280; font-size: 0.9rem; margin-right: 12px;">Not connected</span>
+                <button id="connectBtn" class="btn-connect">Підключити</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="max-width: 800px;">
+        <div id="pollInfoSection" style="background: white; padding: 32px; border-radius: var(--radius); border: 1px solid var(--border-color); margin-bottom: 24px; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 id="pollTitle" style="margin: 0 0 8px 0; font-size: 2rem;">Завантаження...</h1>
+                    <p style="color: var(--text-muted); margin: 0 0 16px 0; font-family: monospace; background: #F3F4F6; display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem;">
+                        Організатор: <span id="organizerAddr">...</span>
+                    </p>
+
+                    <div style="display: flex; gap: 24px; font-size: 0.9rem; color: var(--text-main); margin-top: 16px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">🕒 Початок: <strong id="displayStartTime">...</strong></div>
+                        <div style="display: flex; align-items: center; gap: 6px;">🏁 Кінець: <strong id="displayEndTime">...</strong></div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span id="pollStatus" class="status-badge">...</span>
+                    <span id="whitelistStatus" class="status-badge status-whitelist" style="display:none;">Whitelist</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="votingSection" style="background: white; padding: 32px; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <h3 style="margin-top: 0;">Ваш вибір</h3>
+
+            <form id="voteForm">
+                <div id="optionsContainer" style="margin-bottom: 24px;"></div>
+                <button type="submit" id="voteBtn" class="btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem;">Проголосувати</button>
+            </form>
+
+            <div id="hasVotedMsg" style="display: none; text-align: center; padding: 20px; background: #ECFDF5; border-radius: 8px; color: #065F46; font-weight: 600;">✅ Ви вже проголосували!</div>
+            <div id="pollClosedMsg" style="display: none; text-align: center; padding: 20px; background: #F3F4F6; border-radius: 8px; color: #374151; font-weight: 600;">⛔ Голосування завершено.</div>
+            <div id="notWhitelistedMsg" style="display: none; text-align: center; padding: 20px; background: #FFF7ED; border-radius: 8px; color: #C2410C; font-weight: 600; border: 1px solid #FED7AA;">🚫 Ви не маєте доступу (Not Whitelisted).</div>
+
+            <div id="txStatus"></div>
+        </div>
+
+        <div id="resultsSection" style="margin-top: 32px;">
+            <h3 style="margin-bottom: 16px;">Результати</h3>
+            <div id="resultsChart" style="background: white; padding: 24px; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);"></div>
+        </div>
+
+        <div id="adminPanel" style="display: none;">
+            <h3>🛠 Панель Організатора</h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                <button id="closeVotingBtn" class="btn-danger">⛔ Закрити голосування</button>
+                <button id="enableWhitelistBtn" class="btn-primary" style="background-color: var(--warning-color);">🔒 Увімкнути Whitelist</button>
+            </div>
+
+            <div class="control-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <h4>👤 Внутрішній список</h4>
+                        <span id="whitelistStatusHint" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">...</span>
+                    </div>
+
+                    <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--primary-color);">
+                        <input type="checkbox" id="bulkModeToggle" style="width: 16px; height: 16px; margin: 0;">
+                        Масовий режим
+                    </label>
+                </div>
+
+                <input type="text" id="whitelistAddrInput" placeholder="0x..." style="margin-bottom: 10px;">
+                <textarea id="whitelistBulkInput" rows="5" placeholder="Вставте адреси..." style="display: none; width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px;"></textarea>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button id="addToWlBtn" class="btn-primary">Додати</button>
+                    <button id="removeFromWlBtn" class="btn-outline" style="color: var(--danger-color); border-color: #FECACA;">Видалити</button>
+                </div>
+
+                <div id="whitelistStatusMsg"></div>
+            </div>
+
+            <div class="control-group">
+                <h4>🏢 Зовнішні реєстри</h4>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="registryAddrInput" placeholder="Адреса контракту (0x...)" style="margin: 0; flex: 3;">
+                    <button id="addRegistryBtn" class="btn-primary" style="background: #8B5CF6; flex: 2;">Підключити</button>
+                </div>
+                <div id="registryStatusMsg"></div>
+                <div id="connectedRegistriesList" style="margin-top: 12px; font-size: 0.9rem; color: var(--text-muted);"></div>
+            </div>
+
+            <div class="control-group">
+                <h4>⏰ Налаштування часу</h4>
+                <div class="date-time-grid">
+                    <div>
+                        <label>Початок</label>
+                        <div class="date-time-group">
+                            <input type="date" id="newStartDate" style="flex: 3;">
+                            <input type="time" id="newStartTime" value="00:00" style="flex: 2;">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Кінець</label>
+                        <div class="date-time-group">
+                            <input type="date" id="newEndDate" style="flex: 3;">
+                            <input type="time" id="newEndTime" value="23:59" style="flex: 2;">
+                        </div>
+                    </div>
+                </div>
+                <button id="updateTimeBtn" class="btn-outline" style="width: 100%;">Оновити дати</button>
+                <div id="adminStatus"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; font-size: 1.5rem;">Підтвердження</h3>
+            <p id="modalMessage" class="modal-text" style="color: var(--text-muted);">...</p>
+            <div class="modal-buttons">
+                <button id="modalCancelBtn" class="btn-outline">Скасувати</button>
+                <button id="modalConfirmBtn" class="btn-primary">Підтвердити</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

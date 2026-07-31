@@ -1,103 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voting System Frontend</title>
-    <style>
-        /* Прості стилі для тестування */
-        body { font-family: sans-serif; margin: 20px; line-height: 1.6; }
-        h1, h2, h3, h4 { color: #333; }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 5px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        /* ВИПРАВЛЕНО: Змінено #accountList на #accountsList, щоб відповідати HTML */
-        #accountInfo, #votingSection {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-        #accountsList, #votingDetails, #voteControls { /* ЗМІНЕНО: #accountList на #accountsList */
-            margin-top: 15px;
-            padding-left: 20px;
-            border-left: 3px solid #007bff;
-        }
-        #optionsList label {
-            display: block;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-        #optionsList input[type="radio"],
-        #optionsList input[type="checkbox"] {
-            margin-right: 5px;
-        }
-    </style>
+    <title>Voting DApp - Головна</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="ethers.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Voting System</h1>
 
-    <section id="connectSection">
-        <h2>Connect Wallet</h2>
-        <button id="connectButton">Connect MetaMask</button>
-        <div id="accountInfo" style="display: none;">
-            <p>Status: <span id="status">Not connected</span></p>
-            <p><strong>Active MetaMask Account:</strong> <span id="currentAccount">Not connected</span></p>
-            <div id="accountsList"> <h4>Connected Accounts:</h4>
-                <p>No accounts connected.</p>
+    <header>
+        <div class="container">
+            <div class="header-left-group">
+                <a href="index.html" class="app-logo">
+                    <span style="font-size: 1.5rem;">🗳️</span> Voting DApp
+                </a>
+            </div>
+
+            <div style="display: flex; align-items: center;">
+                <span id="walletInfo" style="font-weight: 600; color: #6B7280; font-size: 0.9rem; margin-right: 12px;">Not connected</span>
+                <button id="connectBtn" class="btn-connect">Підключити</button>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section id="votingSection" style="display: none;">
-        <h2>Voting Details & Actions</h2>
-        <p>Contract Address: <span id="contractAddress"></span></p>
-
-        <div id="votingDetails">
-            <h3>Loading Voting Details...</h3>
-            <p>Title: <span id="votingTitle">-</span></p>
-            <p>Organizer: <span id="votingOrganizer">-</span></p>
-            <p>Starts: <span id="votingStartTime">-</span></p>
-            <p>Ends: <span id="votingEndTime">-</span></p>
-            <p>Type: <span id="votingType">-</span></p>
-            <p>Whitelist Enabled: <span id="votingUseWhitelist">-</span></p>
-            <p>Is closed?: <span id="votingIsClosed">-</span></p>
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1 style="font-size: 1.75rem; margin: 0;">Активні голосування</h1>
+            <a href="create.html" style="text-decoration: none;">
+                <button class="btn-primary" style="font-size: 1rem; padding: 12px 24px;">
+                    + Створити нове
+                </button>
+            </a>
         </div>
 
-        <div id="voteControls">
-            <h4>Voting Options:</h4>
-            <div id="optionsList">
-                <p>Loading options...</p>
+        <div id="pollsList">
+            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                <div class="loader" style="margin: 0 auto 10px auto;"></div>
+                <p>Завантаження списку...</p>
             </div>
-            <button id="voteButton" style="display: none;">Submit Vote</button>
         </div>
+    </main>
 
-        <div id="resultsSection" style="display: none; margin-top: 20px;">
-             <h4>Voting Results:</h4>
-             <div id="resultsList">
-                  <p>Results not available yet.</p>
-             </div>
-        </div>
-
-    </section>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <script src="/static/script.js"></script>
-
+    <script src="app.js"></script>
 </body>
 </html>

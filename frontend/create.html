@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нове голосування</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="ethers.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-left-group">
+                <a href="index.html" class="back-arrow" title="На головну">⬅</a>
+                <a href="index.html" class="app-logo">
+                    <span style="font-size: 1.5rem;">🗳️</span> Voting DApp
+                </a>
+            </div>
+
+            <div style="display: flex; align-items: center;">
+                <span id="walletInfo" style="font-weight: 600; color: #6B7280; font-size: 0.9rem; margin-right: 12px;">Not connected</span>
+                <button id="connectBtn" class="btn-connect">Підключити</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="max-width: 600px;">
+        <div style="background: white; padding: 32px; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+            <form id="createPollForm">
+
+                <label for="pollTitle">Назва голосування</label>
+                <input type="text" id="pollTitle" placeholder="Наприклад: Вибори старости" required autocomplete="off">
+
+                <label>Варіанти відповідей</label>
+                <div id="optionsContainer">
+                    <input type="text" class="poll-option" placeholder="Варіант 1" required>
+                    <input type="text" class="poll-option" placeholder="Варіант 2" required>
+                </div>
+
+                <button type="button" id="addOptionBtn" class="btn-outline" style="width: 100%; margin-bottom: 24px; justify-content: center;">
+                    + Додати ще варіант
+                </button>
+
+                <div style="height: 1px; background: var(--border-color); margin: 0 0 24px 0;"></div>
+
+                <div class="date-time-grid">
+                    <div>
+                        <label>Початок</label>
+                        <div class="date-time-group">
+                            <input type="date" id="startDate" style="flex: 3;">
+                            <input type="time" id="startTime" value="00:00" style="flex: 2;">
+                        </div>
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Залиште пустим = негайно</small>
+                    </div>
+                    <div>
+                        <label>Завершення</label>
+                        <div class="date-time-group">
+                            <input type="date" id="endDate" style="flex: 3;">
+                            <input type="time" id="endTime" value="23:59" style="flex: 2;">
+                        </div>
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Залиште пустим = безстроково</small>
+                    </div>
+                </div>
+
+                <label for="votingType">Тип голосування</label>
+                <select id="votingType">
+                    <option value="0">Один варіант (Single Choice)</option>
+                    <option value="1">Кілька варіантів (Multiple Choice)</option>
+                </select>
+
+                <div style="margin: 20px 0; padding: 12px; background: #F9FAFB; border-radius: 6px; display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="useWhitelist" style="width: 18px; height: 18px; margin: 0;">
+                    <label for="useWhitelist" style="margin: 0; cursor: pointer; font-weight: 500;">Обмежити доступ (Whitelist)</label>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; font-size: 1.1rem; padding: 14px;">
+                    Опублікувати в Блокчейн
+                </button>
+
+                <div id="createStatus"></div>
+            </form>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('addOptionBtn').addEventListener('click', () => {
+            const container = document.getElementById('optionsContainer');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'poll-option';
+            input.placeholder = `Варіант ${container.children.length + 1}`;
+            input.required = true;
+            container.appendChild(input);
+            input.focus();
+        });
+    </script>
+</body>
+</html>
